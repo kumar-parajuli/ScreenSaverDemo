@@ -12,11 +12,15 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.Arrays;
@@ -28,24 +32,48 @@ public class MainActivity extends AppCompatActivity {
     private static final long SLIDE_DELAY_MS = 3000; // 3 seconds
     private int currentPage = 0;
 
-    private List<Integer> images = Arrays.asList(R.drawable.screensaver_background, R.drawable.img, R.drawable.screensaver_logo);
+    private List<Integer> images = Arrays.asList(R.drawable.image1, R.drawable.image4, R.drawable.image5);
     private Handler handler = new Handler();
     private Runnable slideRunnable;
     private ViewPager2 viewPager;
+    private RecyclerView imageSliderRecyclerView;
+    private LinearLayout dotIndicatorLayout;
+    private ImageView[] dots;
+    private int totalSlides = 3;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // Enable full-screen immersive mode
         enableFullScreenMode();
+
         viewPager = findViewById(R.id.viewPager);
+        dotIndicatorLayout = findViewById(R.id.dotIndicatorLayout);
+        imageSliderRecyclerView = findViewById(R.id.imageSliderRecyclerView);
+
+        // Initialize the ViewPager2 and its adapter
         ImageSliderAdapter adapter = new ImageSliderAdapter(this, images);
         viewPager.setAdapter(adapter);
 
-        // Start the image sliding
+
+
+        // Start image slider
         startImageSlider();
 
+
+        // Call the method to add dot indicators
+        addDotsIndicator(0);
+
+        // Set a page change listener to update dots on page change
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                addDotsIndicator(position);
+            }
+        });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
@@ -56,13 +84,31 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_BOOT_COMPLETED}, REQUEST_CODE_BOOT_RECEIVER_PERMISSION);
-//            }
-//        }
         batterySaverModeDisablePermissionRequest();
+    }
+    // Method to handle the dot indicator logic
+    private void addDotsIndicator(int position) {
+        dotIndicatorLayout.removeAllViews(); // Clear previous dots
+        dots = new ImageView[totalSlides]; // Array to hold the dots
+
+        for (int i = 0; i < totalSlides; i++) {
+            dots[i] = new ImageView(this);
+            if (i == position) {
+                // Set the active dot drawable
+                dots[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.active_dot));
+            } else {
+                // Set the inactive dot drawable
+                dots[i].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.inactive_dot));
+            }
+
+            // Define the layout parameters for the dots
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(8, 0, 8, 0); // Margins between dots
+
+            // Add the dot to the layout
+            dotIndicatorLayout.addView(dots[i], params);
+        }
     }
 
     @Override
@@ -170,7 +216,3 @@ public class MainActivity extends AppCompatActivity {
 }
 
 
-//        Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-//        intent.setData(Uri.parse("package:" + getPackageName()));
-//        startActivity(intent);
-//    }

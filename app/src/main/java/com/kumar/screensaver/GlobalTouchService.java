@@ -11,8 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
-import android.media.session.MediaController;
-import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -126,35 +124,6 @@ public class GlobalTouchService extends Service implements View.OnTouchListener 
         initTimer();
         return false;
     }
-
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        mHandler.removeCallbacks(mRunnable);
-//        WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-//        if (windowManager != null && mTouchLayout != null) {
-//            windowManager.removeView(mTouchLayout);
-//        }
-//    }
-
-//    private boolean isMediaPlaying(Context context) {
-//        MediaSessionManager mediaSessionManager = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
-//        if (mediaSessionManager != null) {
-//            List<MediaController> controllers = mediaSessionManager.getActiveSessions(null);
-//            for (MediaController controller : controllers) {
-//                MediaController.PlaybackInfo playbackInfo = controller.getPlaybackInfo();
-//                if (playbackInfo != null) {
-//                    Log.d("MediaCheck", "Playback Info: " + playbackInfo.toString());
-//                    if (controller.getPlaybackState() != null &&
-//                            controller.getPlaybackState().getState() == android.media.session.PlaybackState.STATE_PLAYING) {
-//                        return true;
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
 
     private boolean isAudioPlaying(Context context) {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
