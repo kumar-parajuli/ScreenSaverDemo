@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
+import android.media.session.MediaController;
+import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -104,13 +106,13 @@ public class GlobalTouchService extends Service implements View.OnTouchListener 
         Log.d("GlobalTouchService", "Service started");
 
         // Create a foreground notification for the service (for Android O and above)
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("Global Touch Service")
-                    .setContentText("Service is running...")
-                    .setSmallIcon(R.drawable.screensaver_logo)  // Change this with your own icon
-                    .build();
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Global Touch Service")
+                .setContentText("Service is running...")
+                .setSmallIcon(R.drawable.screensaver_logo)  // Change this with your own icon
+                .build();
 
-            startForeground(1, notification);
+        startForeground(1, notification);
 
         // Start the service in the foreground
         initTimer();
@@ -182,7 +184,7 @@ public class GlobalTouchService extends Service implements View.OnTouchListener 
                             if (!isInForeground) {
                                 Intent launchIntent = getApplication()
                                         .getPackageManager()
-                                        .getLaunchIntentForPackage("com.siddhi.screensaverdemo");
+                                        .getLaunchIntentForPackage("com.kumar.screensaver");
                                 if (launchIntent != null) {
                                     Log.d("IdleDetectorService", "App started");
                                     getApplication().startActivity(launchIntent);
