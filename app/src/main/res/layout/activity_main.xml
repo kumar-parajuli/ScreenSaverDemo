@@ -31,12 +31,24 @@
         android:id="@+id/tv_clock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12:00"
-        android:textSize="48sp"
+        android:textSize="22sp"
         android:textColor="@color/white"
         android:layout_below="@id/tv_screensaver_text"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
+
+
+<!--    Optional Clock Date -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:layout_below="@id/tv_clock"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp" />
+
     <!-- Image Slider RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/imageSliderRecyclerView"

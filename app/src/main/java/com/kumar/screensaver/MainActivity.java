@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,14 +24,18 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private int REQUEST_CODE_OVERLAY_PERMISSION = 123;
     private int REQUEST_CODE_BOOT_RECEIVER_PERMISSION = 321;
     private static final long SLIDE_DELAY_MS = 3000; // 3 seconds
     private int currentPage = 0;
+    private TextView tvClock,tvDate;
 
     private List<Integer> images = Arrays.asList(R.drawable.image1, R.drawable.image4, R.drawable.image5);
     private Handler handler = new Handler();
@@ -49,15 +54,22 @@ public class MainActivity extends AppCompatActivity {
         // Enable full-screen immersive mode
         enableFullScreenMode();
 
+        // Find the TextViews by their IDs
+        tvClock = findViewById(R.id.tv_clock);
+        tvDate = findViewById(R.id.tv_date);
+
         viewPager = findViewById(R.id.viewPager);
         dotIndicatorLayout = findViewById(R.id.dotIndicatorLayout);
         imageSliderRecyclerView = findViewById(R.id.imageSliderRecyclerView);
+
 
         // Initialize the ViewPager2 and its adapter
         ImageSliderAdapter adapter = new ImageSliderAdapter(this, images);
         viewPager.setAdapter(adapter);
 
 
+        // Start updating the time and date
+        updateTimeAndDate();
 
         // Start image slider
         startImageSlider();
@@ -198,6 +210,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //To Update the fetching the real Date and time
+    private void updateTimeAndDate() {
+        // Format time as hh:mm AM/PM (12-hour format)
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        String currentTime = timeFormat.format(new Date());
+
+        // Format date as EEEE, MMMM dd, yyyy (e.g., Monday, August 22, 2023)
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(new Date());
+
+        // Set the current time and date in the respective TextViews
+        tvClock.setText(currentTime);
+        tvDate.setText(currentDate);
+
+        // Repeat this task every 1000 milliseconds (1 second)
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateTimeAndDate(); // Recursive call every second
+            }
+        }, 1000);
+    }
     private void batterySaverModeDisablePermissionRequest() {
 
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
