@@ -3,5 +3,5 @@
 <!--    <string name="screensaver_text">Tap to access FewaPay and start your payment.</string>-->
 
     <string name="screen_saver_background">ScreenSaver Background content Description</string>
-<!--    <string name="app_name">ScreenSaverDemo</string>-->
+    <string name="app_name">ScreenSaverDemo</string>
 </resources>

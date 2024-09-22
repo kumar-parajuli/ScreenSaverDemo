@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,11 +47,20 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout dotIndicatorLayout;
     private ImageView[] dots;
     private int totalSlides = 3;
+//    private final String externalAppPackage = "com.kumar.screensaver";
+    private final String externalAppPackage = "com.ingenico.template";
+
+    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+//        test screen swipe roght
+        gestureDetector = new GestureDetector(this, new GestureListener());
 
         // Enable full-screen immersive mode
         enableFullScreenMode();
@@ -98,6 +109,71 @@ public class MainActivity extends AppCompatActivity {
 
         batterySaverModeDisablePermissionRequest();
     }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (gestureDetector.onTouchEvent(event)) {
+            return true; // If a gesture is detected, return true to indicate the event is handled
+        }
+        return super.dispatchTouchEvent(event); // Otherwise, pass the event to other views/components
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+        private static final int EDGE_THRESHOLD = 50; // Threshold for detecting edge swipe
+
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float diffX = e2.getX() - e1.getX();
+            float diffY = e2.getY() - e1.getY();
+
+            Log.d("Gesture", "onFling detected");
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffX > 0) {
+                        // Right swipe detected
+                        Log.d("Gesture", "Right swipe detected");
+//                        openFewapayApp();
+                    } else {
+                        // Left swipe detected
+                        Log.d("Gesture", "Left swipe detected");
+                        returnToScreensaverApp();
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void returnToScreensaverApp() {
+            // You can finish the current activity and return to the screensaver.
+            finish();
+
+            // Or start the screensaver app again if needed.
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+
+        private void openFewapayApp() {
+            PackageManager packageManager = getPackageManager();
+            Intent intent = packageManager.getLaunchIntentForPackage(externalAppPackage);
+            if (intent != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(MainActivity.this, "Fewapay app not found", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     // Method to handle the dot indicator logic
     private void addDotsIndicator(int position) {
         dotIndicatorLayout.removeAllViews(); // Clear previous dots
