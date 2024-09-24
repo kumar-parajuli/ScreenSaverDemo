@@ -35,7 +35,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     private int REQUEST_CODE_OVERLAY_PERMISSION = 123;
     private int REQUEST_CODE_BOOT_RECEIVER_PERMISSION = 321;
-    private static final long SLIDE_DELAY_MS = 3000; // 3 seconds
+    private static final long SLIDE_DELAY_MS = 5000; // 3 seconds
     private int currentPage = 0;
     private TextView tvClock,tvDate;
 
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout dotIndicatorLayout;
     private ImageView[] dots;
     private int totalSlides = 3;
+    private int totalImages = 3;
 //    private final String externalAppPackage = "com.kumar.screensaver";
     private final String externalAppPackage = "com.ingenico.template";
 
@@ -127,24 +128,16 @@ public class MainActivity extends AppCompatActivity {
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
         private static final int EDGE_THRESHOLD = 50; // Threshold for detecting edge swipe
 
-
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             float diffX = e2.getX() - e1.getX();
-            float diffY = e2.getY() - e1.getY();
 
-            Log.d("Gesture", "onFling detected");
-
-            if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (Math.abs(diffX) > Math.abs(e2.getY() - e1.getY())) { // Check if horizontal swipe
                 if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffX > 0) {
-                        // Right swipe detected
-                        Log.d("Gesture", "Right swipe detected");
-//                        openFewapayApp();
-                    } else {
+                    if (diffX < 0) {
                         // Left swipe detected
                         Log.d("Gesture", "Left swipe detected");
-                        returnToScreensaverApp();
+                        onSwipeLeft();
                     }
                     return true;
                 }
@@ -152,24 +145,22 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
 
-        private void returnToScreensaverApp() {
-            // You can finish the current activity and return to the screensaver.
-            finish();
+        public void onSwipeLeft() {
+            Log.d("Swipe", "Swiped left");
+            // Get the current index from ViewPager2
+            int nextIndex = viewPager.getCurrentItem() + 1;
 
-            // Or start the screensaver app again if needed.
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-
-        private void openFewapayApp() {
-            PackageManager packageManager = getPackageManager();
-            Intent intent = packageManager.getLaunchIntentForPackage(externalAppPackage);
-            if (intent != null) {
-                startActivity(intent);
+            if (nextIndex < totalImages) {
+                // Move to the next image
+                viewPager.setCurrentItem(nextIndex, true);
+                addDotsIndicator(nextIndex); // Update dots indicator
             } else {
-                Toast.makeText(MainActivity.this, "Fewapay app not found", Toast.LENGTH_SHORT).show();
+                Log.d("Swipe", "Reached last image, exiting app.");
+                // Exit the app or perform your desired action
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         }
     }
